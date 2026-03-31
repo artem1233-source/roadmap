@@ -1,0 +1,180 @@
+{
+  "projects": {
+    "ip-armenia": {
+      "id": "ip-armenia",
+      "title": "🏛️ ИП в Армении",
+      "status": "urgent",
+      "progress": 30,
+      "deadline": "2026-04-03",
+      "description": "Регистрация ИП для водородного порошка + банковские счета",
+      "tasks": [
+        {
+          "id": 1,
+          "text": "Подготовить документы",
+          "done": true
+        },
+        {
+          "id": 2,
+          "text": "Получить армянский ID (3 апреля)",
+          "done": false
+        },
+        {
+          "id": 3,
+          "text": "Регистрация ИП",
+          "done": false
+        },
+        {
+          "id": 4,
+          "text": "Ardshinbank + ВТБ Армения",
+          "done": false
+        }
+      ]
+    },
+    "hydrogen-powder": {
+      "id": "hydrogen-powder",
+      "title": "💊 Водородный порошок",
+      "status": "progress",
+      "progress": 75,
+      "deadline": "2026-04-30",
+      "description": "Запуск продукта через сеть из 20 блогеров (~2M аудитория)",
+      "tasks": [
+        {
+          "id": 5,
+          "text": "Продукт готов (140 упаковок)",
+          "done": true
+        },
+        {
+          "id": 6,
+          "text": "Портал в разработке",
+          "done": false
+        },
+        {
+          "id": 7,
+          "text": "Декларация соответствия",
+          "done": false
+        },
+        {
+          "id": 8,
+          "text": "Координация блогеров",
+          "done": false
+        }
+      ]
+    },
+    "content": {
+      "id": "content",
+      "title": "📺 Контент-стратегия",
+      "status": "progress",
+      "progress": 60,
+      "deadline": "2026-03-31",
+      "description": "3 платформы: Telegram + Instagram + YouTube. Прогрев к запуску порошка",
+      "tasks": [
+        {
+          "id": 9,
+          "text": "Анализ 30 видео",
+          "done": true
+        },
+        {
+          "id": 10,
+          "text": "Контент-план готов",
+          "done": true
+        },
+        {
+          "id": 11,
+          "text": "Эфир о митохондриях (31 марта)",
+          "done": false
+        },
+        {
+          "id": 12,
+          "text": "Создание рилсов",
+          "done": false
+        }
+      ]
+    },
+    "courses": {
+      "id": "courses",
+      "title": "📚 Обучающие курсы",
+      "status": "planned",
+      "progress": 25,
+      "deadline": "2026-05-01",
+      "description": "Онлайн-курсы по биохакингу и очищению организма",
+      "tasks": [
+        {
+          "id": 13,
+          "text": "Концепция курса",
+          "done": true
+        },
+        {
+          "id": 14,
+          "text": "Структура программы",
+          "done": false
+        },
+        {
+          "id": 15,
+          "text": "Запись первых модулей",
+          "done": false
+        }
+      ]
+    }
+  },
+  "goals": {
+    "revenue": {
+      "title": "💊 Запуск водородного порошка",
+      "target": 10000000,
+      "current": 2000000,
+      "unit": "₽"
+    },
+    "audience": {
+      "title": "📈 Рост аудитории @kh_artem",
+      "target": 10000,
+      "current": 3200,
+      "unit": "подписчиков"
+    },
+    "legal": {
+      "title": "🏛️ Юридическая структура",
+      "target": 100,
+      "current": 30,
+      "unit": "%"
+    }
+  },
+  "calendar": {
+    "2026-03-31": [
+      {
+        "time": "17:00",
+        "title": "📺 Эфир о митохондриях",
+        "type": "urgent"
+      }
+    ],
+    "2026-04-03": [
+      {
+        "time": "09:00",
+        "title": "🏛️ Получение армянского ID",
+        "type": "urgent"
+      },
+      {
+        "time": "14:00",
+        "title": "🏛️ Регистрация ИП",
+        "type": "urgent"
+      }
+    ],
+    "2026-04-04": [
+      {
+        "time": "10:00",
+        "title": "🏦 Банки: Ardshinbank",
+        "type": "important"
+      }
+    ],
+    "2026-04-05": [
+      {
+        "time": "10:00",
+        "title": "🏦 Банки: ВТБ Армения",
+        "type": "important"
+      }
+    ]
+  },
+  "stats": {
+    "totalProjects": 4,
+    "urgentTasks": 1,
+    "completionRate": 33,
+    "daysToDeadline": 0
+  }
+}

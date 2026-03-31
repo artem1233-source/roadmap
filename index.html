@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дорожная карта Артёма</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 8px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--tg-theme-text-color, #000000);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        .nav-tab:hover {
+            background: var(--tg-theme-hint-color, #999999);
+            color: white;
+        }
+
+        .content {
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Карточки проектов */
+        .project-card {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .project-card.urgent { border-left-color: #ff4757; }
+        .project-card.progress { border-left-color: #ffa502; }
+        .project-card.done { border-left-color: #2ed573; }
+        .project-card.planned { border-left-color: #3742fa; }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .project-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .project-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-urgent { background: #ffebee; color: #c62828; }
+        .status-progress { background: #fff3e0; color: #ef6c00; }
+        .status-done { background: #e8f5e8; color: #2e7d32; }
+        .status-planned { background: #e3f2fd; color: #1565c0; }
+
+        .project-description {
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .project-progress {
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--tg-theme-hint-color, #e0e0e0);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-urgent .progress-fill { background: #ff4757; }
+        .progress-progress .progress-fill { background: #ffa502; }
+        .progress-done .progress-fill { background: #2ed573; }
+        .progress-planned .progress-fill { background: #3742fa; }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #999999);
+            margin-top: 4px;
+        }
+
+        .project-deadline {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #999999);
+            margin-top: 8px;
+        }
+
+        .project-deadline.overdue {
+            color: #ff4757;
+            font-weight: 500;
+        }
+
+        .project-deadline.today {
+            color: #ffa502;
+            font-weight: 500;
+        }
+
+        /* Календарь */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--tg-theme-hint-color, #e0e0e0);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day {
+            background: var(--tg-theme-secondary-bg-color, #ffffff);
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            min-height: 50px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: white;
+        }
+
+        .calendar-day.today {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.has-tasks::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #ff4757;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+        }
+
+        /* Быстрые действия */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quick-action {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--tg-theme-button-color, #2481cc);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #999999);
+            margin-top: 4px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .content {
+                padding: 16px;
+            }
+            
+            .project-card {
+                padding: 12px;
+            }
+            
+            .calendar-grid {
+                font-size: 12px;
+            }
+            
+            .calendar-day {
+                min-height: 40px;
+                padding: 8px;
+            }
+        }
+
+        /* Кнопка добавления */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.2s;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--tg-theme-bg-color, #ffffff);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--tg-theme-hint-color, #999999);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+            border-radius: 8px;
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #2481cc);
+            box-shadow: 0 0 0 3px rgba(36, 129, 204, 0.1);
+        }
+
+        .btn {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            color: var(--tg-theme-text-color, #000000);
+            border: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Дорожная карта</h1>
+        <div class="subtitle">Артём Хачатрян • <span id="current-date"></span></div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="dashboard">📊 Обзор</button>
+        <button class="nav-tab" data-tab="projects">💼 Проекты</button>
+        <button class="nav-tab" data-tab="calendar">📅 Календарь</button>
+        <button class="nav-tab" data-tab="goals">🎯 Цели</button>
+        <button class="nav-tab" data-tab="progress">📈 Прогресс</button>
+    </div>
+
+    <div class="content">
+        <!-- Обзор -->
+        <div class="tab-content active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="active-projects">4</div>
+                    <div class="stat-label">Активных проектов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="urgent-tasks">2</div>
+                    <div class="stat-label">Срочных задач</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completion-rate">73%</div>
+                    <div class="stat-label">Выполнено</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="days-to-deadline">3</div>
+                    <div class="stat-label">До дедлайна</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 16px;">🔥 Приоритетные задачи</h3>
+            
+            <div class="project-card urgent">
+                <div class="project-header">
+                    <div class="project-title">🏛️ ИП в Армении</div>
+                    <div class="project-status status-urgent">СРОЧНО</div>
+                </div>
+                <div class="project-description">
+                    3 апреля: получение ID → регистрация ИП → открытие банков
+                </div>
+                <div class="project-progress progress-urgent">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="progress-text">30% • Осталось 3 дня</div>
+                </div>
+                <div class="project-deadline today">
+                    📅 Дедлайн: 03 апреля 2026 • ЗАВТРА
+                </div>
+            </div>
+
+            <div class="project-card progress">
+                <div class="project-header">
+                    <div class="project-title">💊 Водородный порошок</div>
+                    <div class="project-status status-progress">В РАБОТЕ</div>
+                </div>
+                <div class="project-description">
+                    Портал + декларация + запуск через 20 блогеров
+                </div>
+                <div class="project-progress progress-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">75% • Портал в разработке</div>
+                </div>
+                <div class="project-deadline">
+                    📅 Запуск: апрель 2026
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-action" onclick="showAddTaskModal()">
+                    ➕ Добавить задачу
+                </button>
+                <button class="quick-action" onclick="switchTab('projects')">
+                    📋 Все проекты
+                </button>
+                <button class="quick-action" onclick="switchTab('calendar')">
+                    📅 Календарь
+                </button>
+                <button class="quick-action" onclick="generateReport()">
+                    📊 Отчёт
+                </button>
+            </div>
+        </div>
+
+        <!-- Проекты -->
+        <div class="tab-content" id="projects">
+            <h3 style="margin-bottom: 16px;">💼 Активные проекты</h3>
+            
+            <div class="project-card urgent">
+                <div class="project-header">
+                    <div class="project-title">🏛️ ИП в Армении</div>
+                    <div class="project-status status-urgent">СРОЧНО</div>
+                </div>
+                <div class="project-description">
+                    Регистрация ИП для водородного порошка + банковские счета
+                </div>
+                <div class="project-progress progress-urgent">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="progress-text">30% выполнено</div>
+                </div>
+                <div class="project-deadline today">
+                    📅 Дедлайн: 03 апреля 2026
+                </div>
+                <div style="margin-top: 12px;">
+                    <strong>Задачи:</strong><br>
+                    • ✅ Подготовить документы<br>
+                    • 🔄 Получить армянский ID (3 апреля)<br>
+                    • ⏳ Регистрация ИП<br>
+                    • ⏳ Ardshinbank + ВТБ Армения
+                </div>
+            </div>
+
+            <div class="project-card progress">
+                <div class="project-header">
+                    <div class="project-title">💊 Водородный порошок</div>
+                    <div class="project-status status-progress">В РАБОТЕ</div>
+                </div>
+                <div class="project-description">
+                    Запуск продукта через сеть из 20 блогеров (~2M аудитория)
+                </div>
+                <div class="project-progress progress-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">75% выполнено</div>
+                </div>
+                <div class="project-deadline">
+                    📅 Запуск: апрель 2026
+                </div>
+                <div style="margin-top: 12px;">
+                    <strong>Задачи:</strong><br>
+                    • ✅ Продукт готов (140 упаковок)<br>
+                    • 🔄 Портал в разработке<br>
+                    • ⏳ Декларация соответствия<br>
+                    • ⏳ Координация блогеров
+                </div>
+            </div>
+
+            <div class="project-card progress">
+                <div class="project-header">
+                    <div class="project-title">📺 Контент-стратегия</div>
+                    <div class="project-status status-progress">В РАБОТЕ</div>
+                </div>
+                <div class="project-description">
+                    3 платформы: Telegram + Instagram + YouTube. Прогрев к запуску порошка.
+                </div>
+                <div class="project-progress progress-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <div class="progress-text">60% выполнено</div>
+                </div>
+                <div class="project-deadline">
+                    📅 Эфир: завтра 17:00
+                </div>
+                <div style="margin-top: 12px;">
+                    <strong>Задачи:</strong><br>
+                    • ✅ Анализ 30 видео<br>
+                    • ✅ Контент-план готов<br>
+                    • 🔄 Эфир о митохондриях (31 марта)<br>
+                    • ⏳ Создание рилсов
+                </div>
+            </div>
+
+            <div class="project-card planned">
+                <div class="project-header">
+                    <div class="project-title">📚 Обучающие курсы</div>
+                    <div class="project-status status-planned">ПЛАНИРУЕТСЯ</div>
+                </div>
+                <div class="project-description">
+                    Онлайн-курсы по биохакингу и очищению организма
+                </div>
+                <div class="project-progress progress-planned">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%"></div>
+                    </div>
+                    <div class="progress-text">25% выполнено</div>
+                </div>
+                <div class="project-deadline">
+                    📅 Старт: май 2026
+                </div>
+            </div>
+        </div>
+
+        <!-- Календарь -->
+        <div class="tab-content" id="calendar">
+            <h3 style="margin-bottom: 16px;">📅 Март 2026</h3>
+            
+            <div class="calendar-grid">
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Пн</div>
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Вт</div>
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Ср</div>
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Чт</div>
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Пт</div>
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Сб</div>
+                <div class="calendar-day" style="font-weight: bold; background: var(--tg-theme-hint-color, #999);">Вс</div>
+                
+                <div class="calendar-day"></div>
+                <div class="calendar-day"></div>
+                <div class="calendar-day"></div>
+                <div class="calendar-day"></div>
+                <div class="calendar-day"></div>
+                <div class="calendar-day">1</div>
+                <div class="calendar-day">2</div>
+                
+                <div class="calendar-day has-tasks">3<br><small style="color: #ff4757;">ИП</small></div>
+                <div class="calendar-day">4</div>
+                <div class="calendar-day">5</div>
+                <div class="calendar-day">6</div>
+                <div class="calendar-day">7</div>
+                <div class="calendar-day">8</div>
+                <div class="calendar-day">9</div>
+                
+                <div class="calendar-day">10</div>
+                <div class="calendar-day">11</div>
+                <div class="calendar-day">12</div>
+                <div class="calendar-day">13</div>
+                <div class="calendar-day">14</div>
+                <div class="calendar-day">15</div>
+                <div class="calendar-day">16</div>
+                
+                <div class="calendar-day">17</div>
+                <div class="calendar-day">18</div>
+                <div class="calendar-day">19</div>
+                <div class="calendar-day">20</div>
+                <div class="calendar-day">21</div>
+                <div class="calendar-day">22</div>
+                <div class="calendar-day">23</div>
+                
+                <div class="calendar-day">24</div>
+                <div class="calendar-day">25</div>
+                <div class="calendar-day">26</div>
+                <div class="calendar-day">27</div>
+                <div class="calendar-day">28</div>
+                <div class="calendar-day">29</div>
+                <div class="calendar-day today has-tasks">30<br><small>Сегодня</small></div>
+                
+                <div class="calendar-day has-tasks" style="background: #ffebee;">31<br><small style="color: #c62828;">Эфир 17:00</small></div>
+            </div>
+
+            <h4 style="margin: 20px 0 12px 0;">📋 Ближайшие события</h4>
+            <div class="project-card urgent">
+                <div class="project-title">📺 Эфир о митохондриях</div>
+                <div class="project-description">Zoom, 17:00 МСК. Тема: водородный порошок, ОВП, антиоксиданты</div>
+                <div class="project-deadline today">📅 Завтра, 31 марта</div>
+            </div>
+            
+            <div class="project-card urgent">
+                <div class="project-title">🏛️ Получение армянского ID</div>
+                <div class="project-description">Паспортный стол → ИП → банки</div>
+                <div class="project-deadline today">📅 3 апреля</div>
+            </div>
+        </div>
+
+        <!-- Цели -->
+        <div class="tab-content" id="goals">
+            <h3 style="margin-bottom: 16px;">🎯 Цели на 2026</h3>
+            
+            <div class="project-card progress">
+                <div class="project-header">
+                    <div class="project-title">💊 Запуск водородного порошка</div>
+                    <div class="project-status status-progress">75%</div>
+                </div>
+                <div class="project-description">
+                    Цель: 5-10M₽ выручки за 6 месяцев через сеть блогеров
+                </div>
+                <div class="project-progress progress-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">3 из 4 этапов завершено</div>
+                </div>
+            </div>
+
+            <div class="project-card planned">
+                <div class="project-header">
+                    <div class="project-title">📈 Рост аудитории</div>
+                    <div class="project-status status-planned">25%</div>
+                </div>
+                <div class="project-description">
+                    Цель: @kh_artem 10K подписчиков (сейчас 3.2K)
+                </div>
+                <div class="project-progress progress-planned">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 32%"></div>
+                    </div>
+                    <div class="progress-text">3,200 из 10,000</div>
+                </div>
+            </div>
+
+            <div class="project-card planned">
+                <div class="project-header">
+                    <div class="project-title">🏛️ Юридическая структура</div>
+                    <div class="project-status status-planned">30%</div>
+                </div>
+                <div class="project-description">
+                    ИП Армения + ИП РФ (тесть) + банки + сертификация
+                </div>
+                <div class="project-progress progress-planned">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="progress-text">Документы готовы</div>
+                </div>
+            </div>
+
+            <div class="project-card planned">
+                <div class="project-header">
+                    <div class="project-title">📚 Образовательная платформа</div>
+                    <div class="project-status status-planned">15%</div>
+                </div>
+                <div class="project-description">
+                    Онлайн-курсы, маркетплейс специалистов, сообщество
+                </div>
+                <div class="project-progress progress-planned">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 15%"></div>
+                    </div>
+                    <div class="progress-text">Концепция готова</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Прогресс -->
+        <div class="tab-content" id="progress">
+            <h3 style="margin-bottom: 16px;">📈 Аналитика</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">30</div>
+                    <div class="stat-label">Видео проанализировано</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">45ч</div>
+                    <div class="stat-label">Контента изучено</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3.2K</div>
+                    <div class="stat-label">Подписчиков TG</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">140</div>
+                    <div class="stat-label">Упаковок готово</div>
+                </div>
+            </div>
+
+            <h4 style="margin: 20px 0 12px 0;">📊 Прогресс по неделям</h4>
+            
+            <div class="project-card done">
+                <div class="project-title">📅 Неделя 25-31 марта</div>
+                <div class="project-description">
+                    ✅ Анализ 30 видео<br>
+                    ✅ Контент-стратегия<br>
+                    ✅ Оптимизация AI-системы<br>
+                    🔄 Подготовка эфира
+                </div>
+                <div class="project-progress progress-done">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    <div class="progress-text">85% выполнено</div>
+                </div>
+            </div>
+
+            <div class="project-card progress">
+                <div class="project-title">📅 Неделя 1-7 апреля</div>
+                <div class="project-description">
+                    🎯 Регистрация ИП<br>
+                    🎯 Первый эфир о порошке<br>
+                    🎯 Запуск контент-плана<br>
+                    🎯 Получение декларации
+                </div>
+                <div class="project-progress progress-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                    <div class="progress-text">20% запланировано</div>
+                </div>
+            </div>
+
+            <h4 style="margin: 20px 0 12px 0;">🔥 Ключевые метрики</h4>
+            
+            <div class="project-card">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: center;">
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #2ed573;">2М₽</div>
+                        <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Продано за полгода</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #ffa502;">20</div>
+                        <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Блогеров готовы</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #3742fa;">~2М</div>
+                        <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Общая аудитория</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #ff4757;">3</div>
+                        <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Дня до дедлайна</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB кнопка -->
+    <button class="fab" onclick="showAddTaskModal()">+</button>
+
+    <!-- Модальное окно добавления задачи -->
+    <div class="modal" id="add-task-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="hideAddTaskModal()">&times;</span>
+            <h3 style="margin-bottom: 20px;">➕ Новая задача</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Название</label>
+                <input type="text" class="form-control" id="task-title" placeholder="Что нужно сделать?">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Описание</label>
+                <textarea class="form-control" id="task-description" rows="3" placeholder="Детали задачи..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Проект</label>
+                <select class="form-control" id="task-project">
+                    <option value="">Выберите проект</option>
+                    <option value="ip-armenia">🏛️ ИП в Армении</option>
+                    <option value="hydrogen-powder">💊 Водородный порошок</option>
+                    <option value="content">📺 Контент-стратегия</option>
+                    <option value="courses">📚 Обучающие курсы</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Дедлайн</label>
+                <input type="date" class="form-control" id="task-deadline">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Приоритет</label>
+                <select class="form-control" id="task-priority">
+                    <option value="low">Низкий</option>
+                    <option value="medium" selected>Средний</option>
+                    <option value="high">Высокий</option>
+                    <option value="urgent">Срочно</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn" onclick="saveTask()">Сохранить</button>
+                <button class="btn btn-secondary" onclick="hideAddTaskModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Telegram WebApp инициализация
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // Настройка темы
+            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#000000');
+            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
+            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#2481cc');
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color || '#f4f4f5');
+        }
+
+        // Установка текущей даты
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                timeZone: 'Asia/Yerevan'
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('ru-RU', options);
+        }
+
+        // Переключение табов
+        function switchTab(tabId) {
+            // Скрыть все табы
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активный класс с кнопок
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показать выбранный таб
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        // Модальное окно
+        function showAddTaskModal() {
+            document.getElementById('add-task-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideAddTaskModal() {
+            document.getElementById('add-task-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Очистить форму
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-description').value = '';
+            document.getElementById('task-project').value = '';
+            document.getElementById('task-deadline').value = '';
+            document.getElementById('task-priority').value = 'medium';
+        }
+
+        // Сохранение задачи
+        function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const project = document.getElementById('task-project').value;
+            const deadline = document.getElementById('task-deadline').value;
+            const priority = document.getElementById('task-priority').value;
+            
+            if (!title) {
+                alert('Введите название задачи');
+                return;
+            }
+            
+            // Отправка в Telegram
+            if (window.Telegram && window.Telegram.WebApp) {
+                const taskData = {
+                    action: 'add_task',
+                    title, description, project, deadline, priority,
+                    created: new Date().toISOString()
+                };
+                
+                window.Telegram.WebApp.sendData(JSON.stringify(taskData));
+            }
+            
+            // Уведомление
+            showNotification(`Задача "${title}" добавлена`);
+            hideAddTaskModal();
+        }
+
+        // Генерация отчёта
+        function generateReport() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'generate_report',
+                    date: new Date().toISOString()
+                }));
+            }
+            
+            showNotification('Генерирую еженедельный отчёт...');
+        }
+
+        // Уведомления
+        function showNotification(message) {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.showAlert(message);
+            } else {
+                alert(message);
+            }
+        }
+
+        // Обработчики событий
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            
+            // Клики по табам
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
+            
+            // Закрытие модального окна по клику вне его
+            document.getElementById('add-task-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideAddTaskModal();
+                }
+            });
+            
+            // Обновление даты каждую минуту
+            setInterval(updateCurrentDate, 60000);
+        });
+
+        // Отметка текущего дня в календаре
+        function highlightToday() {
+            const today = new Date();
+            const day = today.getDate();
+            
+            document.querySelectorAll('.calendar-day').forEach(dayEl => {
+                if (dayEl.textContent.includes(day.toString()) && !dayEl.textContent.includes('Пн') && !dayEl.textContent.includes('Вт')) {
+                    dayEl.classList.add('today');
+                }
+            });
+        }
+
+        // Симуляция живых данных
+        function updateLiveData() {
+            // Обновление счётчиков
+            const stats = {
+                'active-projects': Math.floor(Math.random() * 2) + 4,
+                'urgent-tasks': Math.floor(Math.random() * 3) + 1,
+                'completion-rate': Math.floor(Math.random() * 10) + 70 + '%',
+                'days-to-deadline': Math.max(0, 4 - Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % 5)
+            };
+            
+            Object.keys(stats).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.textContent = stats[key];
+            });
+        }
+
+        // Инициализация
+        setTimeout(() => {
+            highlightToday();
+            updateLiveData();
+        }, 100);
+    </script>
+</body>
+</html>

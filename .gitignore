@@ -1,0 +1,26 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+
+# Node.js (if needed in future)
+node_modules/
+npm-debug.log*
+
+# Local development
+.env
+.env.local
