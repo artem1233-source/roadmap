@@ -30,7 +30,7 @@
 
 Приложение автоматически разворачивается на Netlify при каждом пуше в main ветку.
 
-**Live URL:** https://mellifluous-wisp-925616.netlify.app/
+**Live URL:** https://roadmapmy.netlify.app/
 
 ## 📖 О системе "Здоровье 2.0"
 
